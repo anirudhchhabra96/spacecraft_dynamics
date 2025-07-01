@@ -1,50 +1,118 @@
-# 🛰️ Spacecraft Attitude Simulation in MATLAB
+# Spacecraft Attitude Dynamics and Hardware-in-the-Loop Validation
 
-This repository simulates the free rotational motion of a rigid-body spacecraft using Euler's equations and quaternions, visualizes the 3D attitude of a satellite-shaped cube, and plots angular velocity, Euler angles, and Euler angle rates over time.
-
-<p align="center">
-  <img src="preview.gif" width="500"/>
-</p>
+This project simulates the free rotational motion of a spacecraft in 3D using rigid body dynamics (Euler’s equations) and visualizes the evolution of its orientation using a 3D animated cube. It also supports hardware-in-the-loop (HIL) testing using a real hexapod positioning platform, allowing validation of the simulation on physical hardware.
 
 ---
 
-## 📌 Features
+## 🚀 Features
 
-- Integration of 3D rotational dynamics using `ode45`
-- Quaternion-based attitude propagation
-- Real-time 3D animation of a **shiny gold cube satellite**
-- Live display of:
+- Simulates spacecraft rotational dynamics under torque-free motion.
+- Visualizes the cube’s attitude evolution in real-time (animated 3D rendering).
+- Plots:
   - Angular velocity (ω)
-  - Euler angles (roll, pitch, yaw)
-  - Axis of rotation (visualized as a red line)
-- Subplot visualization of:
-  - Body angular velocity
-  - Euler angle rates
-  - Euler angles (ZYX/3-2-1)
+  - Euler angles (ZYX convention)
+  - Euler angle rates (𝜙̇, 𝜃̇, ψ̇)
+- Compares simulated vs. real attitude when using hardware.
+- Option to save animation as GIF or MP4.
+- Includes trajectory playback on a **PI hexapod** with a cube mounted 99 mm above the platform.
+- Records and plots actual hexapod pose (if available) against the simulated trajectory.
 
 ---
 
-## 🧠 Dynamics Model
+## 🧠 Physics Modeled
 
-The simulation uses:
+- Uses Euler's equations for rotational motion:
+  
+dω/dt = J⁻¹ ( -ω × Jω )
 
-- **Euler’s equations** (torque-free rotation):  
-  dω/dt = J⁻¹ · [–ω × (J · ω)]
 
-- **Quaternion kinematics**:  
-  dq/dt = ½ · Ω(ω) · q
-
-- **Euler angle extraction** from quaternion using ZYX convention (3-2-1)
-
-- **Euler angle rates** computed from body angular velocity
+- Quaternion-based integration for stable rotation tracking.
+- Converts quaternion to ZYX Euler angles for interpretability.
 
 ---
 
-## 🛠️ How to Run
+## 🛠️ Hardware-in-the-Loop Setup
 
-1. Clone the repository or download the `.m` files
-2. Open the main script (e.g., `simulate_spacecraft.m`)
-3. Run in MATLAB
+- **Platform:** PI Hexapod (controlled over TCP/IP via PI GCS MATLAB Library)
+- **Setup:** Cube mounted at 99 mm height on hexapod platform
+- **Control Mode:** Position + orientation commands (X, Y, Z, U, V, W axes)
+- **Software:**
+- Uses MATLAB `PI_GCS_Controller` for trajectory execution
+- Streaming of simulated attitude to hexapod
+- Optionally records feedback for closed-loop comparison
 
-```matlab
-simulate_spacecraft
+---
+
+## 🖥️ Requirements
+
+### MATLAB Toolboxes:
+- No special toolboxes required for simulation only.
+- For `quat2rotm` / `rotm2eul` equivalents, custom versions are provided if toolboxes are unavailable.
+
+### Hexapod Control:
+- PI MATLAB GCS2 driver (`PI_MATLAB_Driver_GCS2`)
+- IP and port settings of hexapod controller configured correctly
+
+---
+
+## 📂 File Structure
+
+```bash
+.
+├── sim_vs_hil.m                  # Main script (run this)
+├── spacecraft_dynamics.m        # ODE function
+├── animate_sim_vs_hexapod.m     # 3D visualization for sim vs hardware
+├── create_cube.m                # Cube geometry
+├── quat2eul321.m                # Custom ZYX Euler from quaternion
+├── eul321_to_rotm.m             # Rotation matrix from Euler angles
+├── utils/
+│   └── rotm_to_axis_angle.m     # Used for red line visualization
+├── output/
+│   └── sim_vs_hexapod.mp4       # Example output video (if saved)
+
+## ▶️ How to Run
+1. Simulation Only
+
+sim_vs_hil()
+
+2. With Hardware (Hexapod)
+
+    Ensure your PI hexapod is connected and reachable via TCP/IP.
+
+    Set your hexapod's IP address in the script:
+
+ip = '192.168.20.3';  % or as detected
+
+Then run:
+
+    sim_vs_hil()
+
+📈 Output
+
+    3-panel plot comparing:
+
+        Angular velocity (ω)
+
+        Euler angles
+
+        Euler angle rates
+
+    Dual 3D animation:
+
+        Simulated cube vs. hexapod-tracked cube
+
+        Rotation axis visualized as a red line
+
+        Live overlay of key metrics
+
+📜 License
+
+MIT License — see LICENSE file for details.
+
+
+---
+
+Let me know if you want:
+- Vicon integration instructions included (future extension)
+- Screenshot or animation preview embedded
+- Installation steps for PI GCS MATLAB driver
