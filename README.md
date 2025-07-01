@@ -27,16 +27,10 @@ This project simulates the free rigid-body rotational dynamics of a spacecraft a
 - Cube attached to hexapod, centered at 99 mm height
 - (Optional) `VideoWriter` support for `.mp4` export
 
-## Run the Simulation Only
-
-```matlab
-sim_vs_hil('simulate_only', true);
-```
-
 ## Run Simulation and Stream to Hexapod
 
 ```matlab
-sim_vs_hil('simulate_only', false);
+sim_vs_hil();
 ```
 
 This will:
