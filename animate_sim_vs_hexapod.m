@@ -2,6 +2,8 @@ function animate_sim_vs_hexapod(T, X, actual_angles)
 figure(2);clf;
 set(gcf, 'Color', 'w');
 
+
+
 % Cube geometry
 [v, f] = create_cube();
 
@@ -27,7 +29,9 @@ p1 = patch('Vertices', v, 'Faces', f, ...
 light('Position',[1 2 3],'Style','infinite');
 material shiny;
 title('Numerical Simulation');
-axis(lim); axis vis3d equal; view(160,20); grid on;
+axis(lim); axis vis3d equal; 
+view(160,20); view(0,0);
+grid on;
 xlabel('X'); ylabel('Y'); zlabel('Z');
 hold on;
 rline1 = plot3([0 0], [0 0], [0 0], 'r-', 'LineWidth', 2);
@@ -53,7 +57,10 @@ p2 = patch('Vertices', v, 'Faces', f, ...
 light('Position',[1 2 3],'Style','infinite');
 material shiny;
 title('HIL Simulation');
-axis(lim); axis vis3d equal; view(160,20); grid on;
+axis(lim); axis vis3d equal; 
+view(160,20); 
+view(0,0);
+grid on;
 xlabel('X'); ylabel('Y'); zlabel('Z');
 hold on;
 rline2 = plot3([0 0], [0 0], [0 0], 'r-', 'LineWidth', 2);
@@ -63,6 +70,9 @@ txt2 = annotation('textbox', [0.59 0.05 0.3 0.12], ...
     'String', '', 'FontSize', 10, 'BackgroundColor', 'w', ...
     'EdgeColor', 'k', 'Interpreter', 'tex');
 
+vidobj = VideoWriter('sim_vs_hexapod.mp4', 'MPEG-4');  % or 'Uncompressed AVI'
+vidobj.FrameRate = 5;  % Lower = slower playback
+open(vidobj);
 
 
 % === Animation Loop ===
@@ -126,18 +136,23 @@ for k = 1:5:length(T)
         rpy_deg(1), rpy_deg(2), rpy_deg(3));
     drawnow;
     % === Capture frame as image and write to GIF ===
+    % frame = getframe(gcf);
+    % im = frame2im(frame);
+    % [imind, cm] = rgb2ind(im, 256);
+
+    % if k == 1
+    %     imwrite(imind, cm, 'sim_vs_hexapod.gif', ...
+    %         'gif', 'Loopcount', inf, 'DelayTime', 0.2);  % first frame
+    % else
+    %     imwrite(imind, cm, 'sim_vs_hexapod.gif', ...
+    %         'gif', 'WriteMode', 'append', 'DelayTime', 0.2);  % 0.2s per frame
+    % end
     frame = getframe(gcf);
-    im = frame2im(frame);
-    [imind, cm] = rgb2ind(im, 256);
+    writeVideo(vidobj, frame);
 
-    if k == 1
-        imwrite(imind, cm, 'sim_vs_hexapod.gif', ...
-            'gif', 'Loopcount', inf, 'DelayTime', 0.2);  % first frame
-    else
-        imwrite(imind, cm, 'sim_vs_hexapod.gif', ...
-            'gif', 'WriteMode', 'append', 'DelayTime', 0.2);  % 0.2s per frame
-    end
 
-    pause(0.01);
+    pause(0.2);
 end
+close(vidobj);
+disp('Video saved as sim_vs_hexapod.mp4');
 end
