@@ -54,8 +54,7 @@ This MATLAB project simulates the 3D rotational motion of a rigid spacecraft and
 ## ▶️ How to Run
 
 ```matlab
-sim_vs_hil('simulate_only', true);    % Run only simulation
-sim_vs_hil('simulate_only', false);   % Stream to hexapod + record
+sim_vs_hil();
 ```
 
 ---
