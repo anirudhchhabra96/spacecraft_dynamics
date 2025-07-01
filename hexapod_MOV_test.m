@@ -1,5 +1,5 @@
 %matlab hexapod test script
-
+clear all; clc;
 ip = '192.168.20.3'; % Use "devicesTcpIp = Controller.EnumerateTCPIPDevices('')" to get all PI controller available on the network
 port = 50000;          % Is 50000 for almost all PI controllers
 axis = 'Y';

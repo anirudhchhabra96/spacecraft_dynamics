@@ -20,6 +20,45 @@ J = diag([1.0, 1.5, 2.0]);
 options = odeset('RelTol', 1e-14, 'AbsTol', 1e-18);
 % Simulate
 [T, X] = ode45(@(t, x) spacecraft_dynamics(t, x, J), tspan, x0, options);
+
+
+% Convert quaternion to Euler angles
+euler_deg = rad2deg(zeros(length(T), 3));
+for i = 1:length(T)
+    q = X(i, 4:7)';
+    eul = quat2eul321(q);        % [roll; pitch; yaw] in rad
+    euler_deg(i,:) = rad2deg(eul');  % convert to deg
+end
+
+% === Send to PI Hexapod ===
+fprintf('Streaming pose to hexapod...\n');
+
+for i = 1:length(T)
+    rpy = euler_deg(i, :);  % [roll pitch yaw] in deg
+    
+    % Construct 6D pose: [X Y Z U V W]
+    pose_cmd = [0 0 0 rpy];  % Translation = 0, rotation = [U V W]
+    
+    % Send command
+    PIdevice.MOV('X Y Z U V W', pose_cmd);
+    
+    % Optional: wait for motion to complete (slow, not real-time)
+    % while(PIdevice.IsMoving())
+    %     pause(0.01);
+    % end
+
+    % OR: just pause to match time step
+    if i < length(T)
+        pause(T(i+1) - T(i));
+    end
+end
+
+fprintf('Trajectory finished.\n');
+
+
+
+
+
 % Extract angular velocity from state vector
 omega_body = X(:, 1:3);  % Each row is [ωx ωy ωz] at a time step
 
