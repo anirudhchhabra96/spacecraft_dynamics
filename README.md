@@ -28,15 +28,14 @@ This repository simulates the free rotational motion of a rigid-body spacecraft 
 
 The simulation uses:
 
-- **Euler’s equations** (torque-free rotation):
-  \[
-  \dot{\omega} = J^{-1} \left( -\omega \times (J \omega) \right)
-  \]
-- **Quaternion kinematics**:
-  \[
-  \dot{q} = \frac{1}{2} \Omega(\omega) q
-  \]
+- **Euler’s equations** (torque-free rotation):  
+  dω/dt = J⁻¹ · [–ω × (J · ω)]
+
+- **Quaternion kinematics**:  
+  dq/dt = ½ · Ω(ω) · q
+
 - **Euler angle extraction** from quaternion using ZYX convention (3-2-1)
+
 - **Euler angle rates** computed from body angular velocity
 
 ---
